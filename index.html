@@ -25,6 +25,7 @@
         nEnemies: 30,
         padding: 20
       };
+
       var gameStats = {
         score: 0,
         bestScore: 0
@@ -39,13 +40,14 @@
         .attr('width', gameOptions.width)
         .attr('height', gameOptions.height);
 
-      var updateScore = d3.select('#current-score')
+      var updateScore = function() {d3.select('#current-score')
         .text(gameStats.score.toString());
+      };
 
       var updateBestScore = function() {
         gameStats.bestScore = Math.max(gameStats.bestScore, gameStats.score);
         d3.select('#best-score').text(gameStats.bestScore.toString());
-      }
+      };
 
     //Player
       var Player = function(gameOptions) {
@@ -60,83 +62,95 @@
           this.gameOptions = gameOptions;
         };
 
+        var _this = this;
+
         this.constructor(gameOptions);
 
         this.render = function(to) {
-          this.el = to.append('svg:path')
-                      .attr('d', this.path)
-                      .attr('fill', this.fill);
-
-          this.transform({
-            x : this.gameOptions.width * 0.5,
-            y : this.gameOptions.height * 0.5
+          _this.el = to.append('svg:path')
+                      .attr('d', _this.path)
+                      .attr('fill', _this.fill);
+          _this.transform({
+            x : _this.gameOptions.width * 0.5,
+            y : _this.gameOptions.height * 0.5,
           });
 
-          this.setupDragging = function() {
-            this;
-          };
+          _this.setupDragging();
+          return _this;
         };
 
+        this.getX = function(){return this.x};
         this.setX = function(x) {
-          var minX = this.gameOptions.padding;
-          var maxX = this.gameOptions.width - this.gameOptions.padding;
+          var minX = _this.gameOptions.padding;
+          var maxX = _this.gameOptions.width - _this.gameOptions.padding;
           if (x <= minX){
             x = minX;
           }
           if (x >= maxX){
             x = maxX;
           }
-          this.x = x;
+          _this.x = x;
         };
 
-        this.getY = function(){this.y};
+        this.getY = function(){return this.y};
         this.setY = function(y) {
-          var minY = this.gameOptions.padding;
-          var maxY = this.gameOptions.height - this.gameOptions.padding;
+          var minY = _this.gameOptions.padding;
+          var maxY = _this.gameOptions.height - _this.gameOptions.padding;
           if (y <= minY){
             y = minY;
           }
           if (y >= maxY){
             y = maxY;
           }
-          this.y = y;
+          _this.y = y;
         };
 
         this.transform = function(opts) {
-          this.angle = opts.angle || this.angle;
-          this.setX = opts.x || this.x;
-          this.setY = opts.y || this.y;
-          this.el.attr('transform', ("rotate(" + this.angle + "," + (this.getX()) + "," + (this.getY()) + ") ") + ("translate(" + (this.getX()) + "," + (this.getY()) + ")"));
+         // _this.angle = opts.angle || _this.angle;
+          _this.setX (opts.x || _this.x);
+          _this.setY (opts.y || _this.y);
+          _this.el.attr ('transform', ("rotate(" + _this.angle + "," + (_this.getX()) + "," + (_this.getY()) + ") ") + ("translate(" + (_this.getX()) + "," + (_this.getY()) + ")"));
         };
 
         this.moveAbsolute = function(x,y){
-          this.transform();
-          this.x = x;
-          this.y = y;
+          _this.transform();
+          _this.x = x;
+          _this.y = y;
         };
 
-        this.moveRelative = function(dx,dy){
-          this.transform();
-          this.x = this.getX()+dx;
-          this.y = this.getY()+dy;
-          this.angle = 360 * (Math.atan2(dy,dx)/(Math.PI*2));
+        this.moveRelative = function(dx, dy) {
+          return _this.transform({
+            x: _this.getX() + dx,
+            y: _this.getY() + dy,
+            angle: 360 * (Math.atan2(dy, dx) / (Math.PI * 2))
+          });
         };
 
-        this.setupDragging = function(){
-          var that = this;
-          var dragMove = function(){
-            that.moveRelative(d3.event.dx, d3.event.dy)
+          this.setupDragging = function() {
+            var drag, dragMove;
+            dragMove = function() {
+              return _this.moveRelative(d3.event.dx, d3.event.dy);
+            };
+            drag = d3.behavior.drag().on('drag', dragMove);
+            return _this.el.call(drag);
           };
-          var drag = d3.behavior.drag()
-            .on('drag', dragMove);
-          this.el.call(drag);
-        };
-      };
+
+      //   this.setupDragging = function(){
+      //     var that = this;
+      //     var dragMove = function(){
+      //       return that.moveRelative(d3.event.dx, d3.event.dy)
+      //     };
+      //     var drag = d3.behavior.drag()
+      //       .on('drag', dragMove);
+      //     return that.el.call(drag);
+      //   };
+     };
 
       var players = [];
       var player1 = new Player(gameOptions);
       players.push(player1.render(gameBoard));
-      players.push(player1.render(gameBoard));
+            console.log(players);
+
 
     //Enemies
       var makeEnemies = function(){
