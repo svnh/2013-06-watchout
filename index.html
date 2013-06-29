@@ -1,0 +1,79 @@
+<!DOCTYPE html >
+
+<html>
+  <head>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="http://underscorejs.org/underscore-min.js"></script>
+    <title>Watchout</title>
+  </head>
+
+  <body>
+    <div class= "container">
+      <div class = "gameTitle">
+        <h1>Game Name</h1>
+      </div>
+      <div class = "scores">
+        <h3>High Score: <span id="best-score"></span></h3>
+        <h3>Current: <span id="current-score"></span></h3>
+      </div>
+    </div>
+    <script>
+    //Game variables
+      var gameOptions = {
+        height: 450,
+        width: 700,
+        nEnemies: 30,
+        padding: 20
+      };
+      var gameStats = {
+        score: 0,
+        bestScore: 0
+      };
+
+      var axes = {
+        x: d3.scale.linear().domain([0,100]).range([0,gameOptions.width]),
+        y: d3.scale.linear().domain([0,100]).range([0,gameOptions.height])
+      };
+
+      var gameBoard = d3.select('.container').append('svg:svg')
+        .attr('width', gameOptions.width)
+        .attr('height', gameOptions.height);
+
+      var updateScore = d3.select('#current-score')
+        .text(gameStats.score.toString());
+
+    //Enemies
+      var makeEnemies = function(){
+        return _.range(0, gameOptions.nEnemies).map(function(i){
+          return {
+            id : i,
+            x : Math.random()*100,
+            y : Math.random()*100
+          }
+        });
+      };
+
+      var render = function(enemy_data){
+        var enemies = gameBoard.selectAll('circle.enemy')
+          .data(enemy_data, function(d){
+            return d.id;
+          })
+        enemies.enter().append('svg:circle')
+          .attr('class', 'enemy')
+          .attr('cx', function(enemy){
+            return axes.x(enemy.x)
+          })
+          .attr('cy', function(enemy){
+            return axes.y(enemy.y)
+          })
+          .attr('r', 4);
+
+        enemies.exit().remove();
+      };
+
+      var enemyPositions = makeEnemies();
+      console.log(enemyPositions);
+      render(enemyPositions);
+    </script>
+  </body>
+</html>
