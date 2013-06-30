@@ -5,6 +5,11 @@
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="http://underscorejs.org/underscore-min.js"></script>
     <title>Watchout</title>
+    <style>
+      .enemy {
+        fill: red;
+      }
+    </style>
   </head>
 
   <body>
@@ -139,7 +144,7 @@
       var players = [];
       var player1 = new Player(gameOptions);
       players.push(player1.render(gameBoard));
-      players.push((new Player(gameOptions)).render(gameBoard));
+      //players.push((new Player(gameOptions)).render(gameBoard));
 
 
     //Enemies
