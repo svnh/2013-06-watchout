@@ -106,7 +106,7 @@
         };
 
         this.transform = function(opts) {
-         // _this.angle = opts.angle || _this.angle;
+          _this.angle = opts.angle || _this.angle;
           _this.setX (opts.x || _this.x);
           _this.setY (opts.y || _this.y);
           _this.el.attr ('transform', ("rotate(" + _this.angle + "," + (_this.getX()) + "," + (_this.getY()) + ") ") + ("translate(" + (_this.getX()) + "," + (_this.getY()) + ")"));
@@ -134,22 +134,12 @@
             drag = d3.behavior.drag().on('drag', dragMove);
             return _this.el.call(drag);
           };
-
-      //   this.setupDragging = function(){
-      //     var that = this;
-      //     var dragMove = function(){
-      //       return that.moveRelative(d3.event.dx, d3.event.dy)
-      //     };
-      //     var drag = d3.behavior.drag()
-      //       .on('drag', dragMove);
-      //     return that.el.call(drag);
-      //   };
      };
 
       var players = [];
       var player1 = new Player(gameOptions);
       players.push(player1.render(gameBoard));
-            console.log(players);
+      players.push((new Player(gameOptions)).render(gameBoard));
 
 
     //Enemies
@@ -189,7 +179,7 @@
 
           var separation = Math.sqrt( Math.pow(xDiff,2) + Math.pow(yDiff,2));
           if (separation < radiusSum) {
-            collidedCallback(player1,enemy)
+            return collidedCallback(player1,enemy)
           }
         });
       };
@@ -197,7 +187,7 @@
       var onCollision = function(){
         updateBestScore();
         gameStats.score = 0;
-        updateScore();
+        return updateScore();
       }
 
       //Tweening
@@ -217,12 +207,12 @@
             x: startPos.x + (endPos.x - startPos.x)*t,
             y: startPos.y + (endPos.y - startPos.y)*t
           };
-          enemy.attr('cx', enemyNextPos.x)
+          return enemy.attr('cx', enemyNextPos.x)
             .attr('cy', enemyNextPos.y);
         };
       };
 
-      enemies
+      return enemies
         .transition()
           .duration(500)
           .attr('r', 10)
@@ -235,19 +225,17 @@
       var play = function(){
         var gameTurn = function(){
           var newEnemyPositions = makeEnemies();
-          render(newEnemyPositions);
+          return render(newEnemyPositions);
         }
         var increaseScore = function (){
           gameStats.score += 1;
-          updateScore();
+          return updateScore();
         }
         gameTurn();
         setInterval(gameTurn, 2000);
+        return setInterval(increaseScore, 50);
       }
       play();
-      // var enemyPositions = makeEnemies();
-      // console.log(enemyPositions);
-      // render(enemyPositions);
     </script>
   </body>
 </html>
